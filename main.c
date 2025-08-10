@@ -5,8 +5,6 @@
 #include<string.h>
 #include<conio.h>
 #include<time.h>
-#include<cstdlib>
-#include<random>
 
 //RANDOM TIME GENERATION FUNCTION
 int randomInRange(int min, int max) {
@@ -20,24 +18,31 @@ int randomInRange(int min, int max) {
 | |_| | |___|  _/ ___ \ |_| | |___| |     \ V /  | || |___  \ V  V /  
 |____/|_____|_|/_/   \_\___/|_____|_|      \_/  |___|_____|  \_/\_/   
 */
-
+void printCentered(const char *text, int width) {
+    int len = strlen(text);
+    int padding = (width - len) / 2;
+    for (int i = 0; i < padding; i++) printf(" ");
+    printf("%s", text);
+}
 
 void defaultPage()
 
 {
+    const int WIDTH = 90;
     //printf("\033[1;36m");  // Bold + Cyan
-    printf("\033[1;35m");
-    printf(
-"....###.....######..########.##.....##....###.......###...\n"
-"...##.##...##....##....##....##.....##...##.##.....##.##..\n"
-"..##...##..##..........##....##.....##..##...##...##...##.\n"
-".##.....##..######.....##....#########.##.....##.##.....##\n"
-".#########.......##....##....##.....##.#########.#########\n"
-".##.....##.##....##....##....##.....##.##.....##.##.....##\n"
-".##.....##..######.....##....##.....##.##.....##.##.....##\n"
-);
-    printf("\033[0m");
-    printf("Welcome to \"ASTHAA\". In Simplicity, we believe!\n");
+    printCentered("....###.....######..########.##.....##....###.......###...\n", WIDTH);
+    printCentered("...##.##...##....##....##....##.....##...##.##.....##.##..\n", WIDTH);
+    printCentered("..##...##..##..........##....##.....##..##...##...##...##.\n", WIDTH);
+    printCentered(".##.....##..######.....##....#########.##.....##.##.....##\n", WIDTH);
+    printCentered(".#########.......##....##....##.....##.#########.#########\n", WIDTH);
+    printCentered(".##.....##.##....##....##....##.....##.##.....##.##.....##\n", WIDTH);
+    printCentered(".##.....##..######.....##....##.....##.##.....##.##.....##\n", WIDTH);
+
+    printf("\033[0m"); // Reset color
+
+    printf("\n");
+    printCentered("Welcome to \"ASTHAA\". In Simplicity, we believe!\n", WIDTH);
+    printf("\n");
     printf("Menu Options:\n");
     printf("1. Registration (For Patients Only)\n");
     printf("2. Login (As Patient, Doctor, Admin)\n");
