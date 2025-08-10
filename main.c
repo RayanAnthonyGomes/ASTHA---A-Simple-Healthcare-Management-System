@@ -139,6 +139,16 @@ void inputPassword(char *password, int maxLength) {
         }
     }
 }
+
+void emergencyContacts(void);
+
+
+
+
+
+
+
+
 /*
  ____  _____ _____ _   _   _ _   _____  __     _____ _______        __
 |  _ \| ____|  ___/ \ | | | | | |_   _| \ \   / /_ _| ____\ \      / /
@@ -204,8 +214,12 @@ void defaultPage() {
 
 //Function 1: Patient registration
 void registerPatient(void);
-
-
+void patientDashboard(char name[], char phone[]);
+void doctorDashboard(char name[], char phone[]);
+void adminDashboard(char name[], char phone[]);
+//Function 2: Login option
+void loginOption(void);
+void appointmentForm(const char *patientPhone);
 
 int main() {
     defaultPage();
@@ -216,10 +230,10 @@ switch (x) {
     registerPatient();
     break;
   case 2:
-    //loginOption();
+    loginOption();
     break;
   case 3:
-    //blah blah.
+    emergencyContacts();
     break;
   case 4:
     //blah blah.
@@ -396,9 +410,8 @@ void patientDashboard(char name[], char phone[]) {
         
         switch(option) {
             case 1:
-                if(appointmentForm(phone)) {
-                    printf("\nReturning to patient dashboard...\n");
-                }
+                appointmentForm(phone);  // Just pass the variable name
+                printf("\nReturning to patient dashboard...\n");
                 break;
             case 2:
                 // if(viewAppointments(phone)) {
@@ -444,9 +457,9 @@ void doctorDashboard(char name[], char phone[]) {
         
         switch(option) {
             case 1:
-                if(viewDoctorAppointments(phone)) {
-                    printf("\nReturning to doctor dashboard...\n");
-                }
+                // if(viewDoctorAppointments(phone)) {
+                //     printf("\nReturning to doctor dashboard...\n");
+                // }
                 break;
             case 2:
                 // if(viewPatientDetails()) {
@@ -707,4 +720,231 @@ void emergencyContacts() {
     printf("5. Local Hospital: 16263\n");
     printf("6. Back to Main Menu\n");
     
+}
+/*
+ _______    ______  ________  ______  ________  __    __  ________       
+|       \  /      \|        \|      \|        \|  \  |  \|        \      
+| $$$$$$$\|  $$$$$$\\$$$$$$$$ \$$$$$$| $$$$$$$$| $$\ | $$ \$$$$$$$$      
+| $$__/ $$| $$__| $$  | $$     | $$  | $$__    | $$$\| $$   | $$         
+| $$    $$| $$    $$  | $$     | $$  | $$  \   | $$$$\ $$   | $$         
+| $$$$$$$ | $$$$$$$$  | $$     | $$  | $$$$$   | $$\$$ $$   | $$         
+| $$      | $$  | $$  | $$    _| $$_ | $$_____ | $$ \$$$$   | $$         
+| $$      | $$  | $$  | $$   |   $$ \| $$     \| $$  \$$$   | $$         
+ \$$       \$$   \$$   \$$    \$$$$$$ \$$$$$$$$ \$$   \$$    \$$         
+                                                                         
+                                                                         
+                                                                         
+ __       __   ______   _______   __    __  __        ________   ______  
+|  \     /  \ /      \ |       \ |  \  |  \|  \      |        \ /      \ 
+| $$\   /  $$|  $$$$$$\| $$$$$$$\| $$  | $$| $$      | $$$$$$$$|  $$$$$$\
+| $$$\ /  $$$| $$  | $$| $$  | $$| $$  | $$| $$      | $$__    | $$___\$$
+| $$$$\  $$$$| $$  | $$| $$  | $$| $$  | $$| $$      | $$  \    \$$    \ 
+| $$\$$ $$ $$| $$  | $$| $$  | $$| $$  | $$| $$      | $$$$$    _\$$$$$$\
+| $$ \$$$| $$| $$__/ $$| $$__/ $$| $$__/ $$| $$_____ | $$_____ |  \__| $$
+| $$  \$ | $$ \$$    $$| $$    $$ \$$    $$| $$     \| $$     \ \$$    $$
+ \$$      \$$  \$$$$$$  \$$$$$$$   \$$$$$$  \$$$$$$$$ \$$$$$$$$  \$$$$$$ 
+                                                                         
+*/
+
+
+void appointmentForm (const char *patientPhone) {
+    // Open patients file to get existing patient data
+    FILE *pfp = fopen("patients.txt", "r");
+    if (pfp == NULL) {
+        printf("Error: Could not open patients database\n");
+        return;
+    }
+
+        srand(time(NULL)); // Random number generation er jonno srand use korsi
+//Ajker date fix kortesi
+    time_t t = time(NULL);
+    struct tm currentDate = *localtime(&t);
+    struct tm avvailableDates[5]; // 5 ta available date rakhsi
+    for (int i = 0; i<5; i++){
+        avvailableDates[i] = currentDate; //current date theke shuru hobe
+        int addDays = randomInRange(1, 30); // 1 theke 30 din er moddhe random date add korbo;
+        avvailableDates[i].tm_mday += addDays; //din add korlam
+        mktime(&avvailableDates[i]); //mktime diye date ke normalize korlam
+    }
+
+    // Variables to store patient data
+    char pName[100], pEmail[100], pPassword[30];
+    int pAge;
+    float pWeight;
+    int patientFound = 0;
+
+    // Search for patient in database
+    char tempPhone[20];
+    while (fscanf(pfp, "%[^,],%[^,],%[^,],%d,%[^,],%f\n", 
+                 tempPhone, pPassword, pName, &pAge, pEmail, &pWeight) != EOF) {
+        if (strcmp(tempPhone, patientPhone) == 0) {
+            patientFound = 1;
+            break;
+        }
+    }
+    fclose(pfp);
+
+    if (!patientFound) {
+        printf("Error: Patient record not found\n");
+        return;
+    }
+
+    // Now only ask for medical-specific info not already in patient record
+    char bloodGroup[10], problem[300];
+    float height, bmi;
+
+    printf("\nAppointment Booking\n");
+    printf("\n--------------------\n");
+    printf("Patient: %s (Age: %d, Weight: %.2f kg)\n", pName, pAge, pWeight);
+
+    // Get additional medical info
+    printf("Height (in meters): ");
+    scanf("%f", &height);
+    getchar(); // Clear input buffer
+
+    printf("Blood Group (e.g., A+, B-, O+): ");
+    scanf("%9s", bloodGroup);
+    getchar();
+
+    printf("Briefly describe your health issue: ");
+    fgets(problem, sizeof(problem), stdin);
+    problem[strcspn(problem, "\n")] = 0;
+
+    // Calculate BMI
+    bmi = pWeight / (height * height);
+    //patient er info shesh
+    
+        FILE *fp = fopen("doctors.txt", "r");
+    if (fp == NULL) {
+        printf("Error: Could not open doctors.txt\n");
+        return;
+    }
+    //temp vars nisi
+    char dPhone[20], dPass[30], dName[100], dEmail[100], specialization[100];
+    int dAge;
+    float dWeight;
+
+    char doctorIDs[20][10];
+    char doctorNames[20][100];
+    char doctorSpecs[20][100];
+    int docCount = 0;
+
+    printf("\n\nAvailable Doctors:\n");
+    while (fscanf(fp, "%[^,],%[^,],%[^,],%d,%[^,],%f,%[^\n]\n",
+                  dPhone, dPass, dName, &dAge, dEmail, &dWeight, specialization) != EOF) {
+        printf("ID: %s\nName: Dr. %s\nSpecialization: %s\n", dPhone, dName, specialization);
+
+        if (strcmp(specialization, "General Physician") == 0)
+            printf("Example Issues: Fever, Cold, Weakness\n");
+        else if (strcmp(specialization, "Pediatrician") == 0)
+            printf("Example Issues: Child fever, Vaccine, Nutrition\n");
+        else if (strcmp(specialization, "Dermatologist") == 0)
+            printf("Example Issues: Skin rash, Acne, Allergy\n");
+        else if (strcmp(specialization, "Cardiologist") == 0)
+            printf("Example Issues: Chest pain, Heart disease, Hypertension\n");
+         
+
+        printf("-----------------------------------\n");
+
+        strcpy(doctorIDs[docCount], dPhone);
+        strcpy(doctorNames[docCount], dName);
+        strcpy(doctorSpecs[docCount], specialization);
+        docCount++;
+    }
+    fclose(fp);
+    //ebar doc slect korbe
+    char selectedDoctorID[20];
+    printf("Enter Doctor ID to book appointment with: ");
+    scanf("%s", selectedDoctorID);
+
+    int found = -1;
+    for (int i = 0; i < docCount; i++) {
+        if (strcmp(selectedDoctorID, doctorIDs[i]) == 0) {
+            found = i;
+            break;
+        }
+    }
+    if (found == -1) {
+        printf("Invalid Doctor ID. Appointment not booked.\n"); //jodi pick e na kore tahole to appt dite parbo na
+        return;
+    }
+
+    //SELECT Date and Time 
+    //nicher ta re baad diye random date and time generate korbo
+    // char date[20], time[20];
+    // printf("Enter Appointment Date (Year-Month-Date): ");
+    // scanf("%s", date);
+    // printf("Enter Appointment Time (for example, 10:30AM): ");
+    // scanf("%s", time);
+
+    printf("Available Dates:\n");
+    for(int i = 0; i < 5; i++){
+        printf("%d. %02d-%02d-%d\n",i+1, avvailableDates[i].tm_mday, avvailableDates[i].tm_mon + 1, avvailableDates[i].tm_year + 1900);
+    }
+
+    //ekhn patient date select korbe
+        int dateChoice;
+    printf("Select a date form options 1-5: ");
+    scanf("%d", &dateChoice);
+    if (dateChoice < 1 || dateChoice > 5) {
+        printf("Invalid date choice. Appointment not booked.\n");
+        return;
+    }
+        struct tm chosenDate = avvailableDates[dateChoice - 1]; // 1-5 er moddhe select korbe
+
+        //ekhn user re diye time select korabo
+
+        int numslots = randomInRange(3, 5); // 3 theke 5 ta time slot generate korbo
+
+char timeSlots[5][10]; // Assuming 24-hour format like "14:00"
+
+int hourOptions[] = {9,10,11,12,13,14,15,16,17}; // 9AM - 5PM
+
+for (int i = 0; i < numslots; i++) {
+    int hour = hourOptions[randomInRange(0, 8)];
+    snprintf(timeSlots[i], sizeof(timeSlots[i]), "%02d:00", hour); //I USED snprintf to format and store the time like "09:00", "14:00", etc. 
+}
+ printf("Available Time Slots for 27-08-2025:\n");
+
+    // Display time slots to user
+    for (int i = 0; i < numslots; i++) {
+        printf("%d. %s\n", i + 1, timeSlots[i]);
+    }
+
+
+                //ekhn patient time select korbe
+                int timeChoice;
+                printf("Select a time slot (1-%d): ", numslots);
+                scanf("%d", &timeChoice);
+                if (timeChoice < 1 || timeChoice > numslots) {
+    printf("Invalid time choice. Appointment not booked.\n");
+    return;
+}
+
+    //pura appt er details show korabo
+    printf("\nAppointment Summary \n");
+    printf("Patient Name: %s\nAge: %d\nHeight: %.2f m\nWeight: %.2f kg\nBMI: %.2f\n", pName, pAge, height, pWeight, bmi);
+    printf("Blood Group: %s\nProblem: %s\n", bloodGroup, problem);
+   printf("Doctor: Dr. %s (%s)\nDate: %02d-%02d-%d\nTime: %s\n",
+       doctorNames[found], doctorSpecs[found],
+       chosenDate.tm_mday, chosenDate.tm_mon + 1, chosenDate.tm_year + 1900,
+       timeSlots[timeChoice - 1]);
+
+
+    // When saving to appointments.txt, use the existing patient data
+    FILE *afp = fopen("appointments.txt", "a");
+    if (afp == NULL) {
+        printf("Error: Could not save appointment\n");
+        return;
+    }
+
+    fprintf(afp, "%s,%s,%d,%.2f,%.2f,%s,%.2f,%s,%s,%s,%s,%02d-%02d-%d,%s\n",
+        patientPhone, pName, pAge, height, pWeight, bloodGroup, bmi,
+        problem, doctorIDs[found], doctorNames[found], doctorSpecs[found],
+        chosenDate.tm_mday, chosenDate.tm_mon + 1, chosenDate.tm_year + 1900,
+        timeSlots[timeChoice - 1]);
+
+    fclose(afp);
+    printf("\nAppointment successfully booked!\n");
+
 }
