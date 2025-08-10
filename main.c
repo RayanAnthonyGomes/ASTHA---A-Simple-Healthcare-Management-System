@@ -5,6 +5,7 @@
 #include<string.h>
 #include<conio.h>
 #include<time.h>
+#include <windows.h>
 
 //RANDOM TIME GENERATION FUNCTION
 int randomInRange(int min, int max) {
@@ -18,30 +19,42 @@ int randomInRange(int min, int max) {
 | |_| | |___|  _/ ___ \ |_| | |___| |     \ V /  | || |___  \ V  V /  
 |____/|_____|_|/_/   \_\___/|_____|_|      \_/  |___|_____|  \_/\_/   
 */
-void printCentered(const char *text, int width) {
+// Function to get console width
+int getConsoleWidth() {
+    CONSOLE_SCREEN_BUFFER_INFO csbi;
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    return csbi.srWindow.Right - csbi.srWindow.Left + 1;
+}
+void printCentered(const char *text) {
+    int consoleWidth = getConsoleWidth();
     int len = strlen(text);
-    int padding = (width - len) / 2;
+    // Remove newline character from length calculation if present
+    int textLen = (text[len-1] == '\n') ? len-1 : len;
+    int padding = (consoleWidth - textLen) / 2;
+    if (padding < 0) padding = 0;  // Ensure padding isn't negative
+    
     for (int i = 0; i < padding; i++) printf(" ");
     printf("%s", text);
 }
 
-void defaultPage()
-
-{
-    const int WIDTH = 90;
-    //printf("\033[1;36m");  // Bold + Cyan
-    printCentered("....###.....######..########.##.....##....###.......###...\n", WIDTH);
-    printCentered("...##.##...##....##....##....##.....##...##.##.....##.##..\n", WIDTH);
-    printCentered("..##...##..##..........##....##.....##..##...##...##...##.\n", WIDTH);
-    printCentered(".##.....##..######.....##....#########.##.....##.##.....##\n", WIDTH);
-    printCentered(".#########.......##....##....##.....##.#########.#########\n", WIDTH);
-    printCentered(".##.....##.##....##....##....##.....##.##.....##.##.....##\n", WIDTH);
-    printCentered(".##.....##..######.....##....##.....##.##.....##.##.....##\n", WIDTH);
+void defaultPage() {
+    printf("\033[1;36m");  // Bold + Cyan
+    printCentered("....###.....######..########.##.....##....###.......###...\n");
+    printCentered("...##.##...##....##....##....##.....##...##.##.....##.##..\n");
+    printCentered("..##...##..##..........##....##.....##..##...##...##...##.\n");
+    printCentered(".##.....##..######.....##....#########.##.....##.##.....##\n");
+    printCentered(".#########.......##....##....##.....##.#########.#########\n");
+    printCentered(".##.....##.##....##....##....##.....##.##.....##.##.....##\n");
+    printCentered(".##.....##..######.....##....##.....##.##.....##.##.....##\n");
 
     printf("\033[0m"); // Reset color
 
     printf("\n");
-    printCentered("Welcome to \"ASTHAA\". In Simplicity, we believe!\n", WIDTH);
+    printCentered("Welcome to \"ASTHAA\". In Simplicity, We Trust!\n");
+    printf("\n");
+    
+    // For the menu options, we'll not center them 
+
     printf("\n");
     printf("Menu Options:\n");
     printf("1. Registration (For Patients Only)\n");
@@ -50,21 +63,11 @@ void defaultPage()
     printf("4. About Us\n");
     printf("5. Exit\n");
     printf("\n");
-
     printf("Enter any option (1-5) to continue: ");
 
-
-/* COLOR CODES
-Red: \033[1;31m
-Green: \033[1;32m
-Yellow: \033[1;33m
-Blue: \033[1;34m
-Magenta: \033[1;35m
-Cyan: \033[1;36m
-White: \033[1;37m
-*/
 }
 
-int main(){
+int main() {
     defaultPage();
+    return 0;
 }
