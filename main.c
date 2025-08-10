@@ -18,6 +18,10 @@ int randomInRange(int min, int max) {
     return rand() % (max - min + 1) + min;
 }
 
+// Helper function to check for "back" command
+bool checkForBackCommand(const char* input) {
+    return (strcmp(input, "back") == 0 || strcmp(input, "BACK") == 0);
+}
 //password validation
 bool validatePasswordWithFeedback(const char *password) {
     bool hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
@@ -260,74 +264,6 @@ switch (x) {
    ░░░░░  ░░░░░  ░░░░░░  ░░░░ ░░░░░                                     
 */
 
-// void registerPatient()
-// {
-//  //First step is to open my database and get the patients.txt file to edit it. Append mode e jawa lagbe age then shob kichu korte parbo
-//  FILE *fp = fopen("patients.txt", "a");
-//     if (fp == NULL) {
-//         printf("Error opening file for writing.\n");
-//         return;
-//     }
-
-
-// //Variables declare korsi
-// char name[100], email[100], phone[20], password[30];
-// int age;
-// float weight;
-
-// printf("You have selected the patient register option. \nPlease fill the form up to continue your registration.\n\nPatient Registration Form:\n");
-
-// printf("Enter Your Name: ");
-//     getchar(); //previous input theke line clear korlam
-// fgets(name, sizeof(name), stdin); //fgets diye input nicchi
-//     name[strcspn(name, "\n")] = 0; //Notun line shoraitesi
-
-// printf("Age: ");
-//     scanf("%d", &age);
-
-// printf("Weight (kg): ");
-//     scanf("%f", &weight);
-
-// printf("Email: ");
-//     scanf("%s", email);
-
-// printf("Phone Number: ");
-//     scanf("%s", phone);
-
-// printf("Set a Password: ");
-// //password masking ++ STRONG PASSSWORD CHECK KORTESI
-
-// while (1) {
-//     inputPassword(password, sizeof(password));
-//     printf("Password must be at least 8 characters long, and include:\n- 1 uppercase letter\n- 1 lowercase letter\n- 1 number\n- 1 symbol\n");
-//     if (!isStrongPassword(password)) {
-//         printf("Password must be at least 8 characters long, contain 1 uppercase, 1 lowercase, and 1 symbol.\n");
-//         printf("Enter again: ");
-//     } else {
-//         break;
-//     }
-// }
-
-// //Patients.txt file e data dicchi
-// fprintf(fp, "%s,%s,%s,%d,%s,%.2f\n", phone, password, name, age, email, weight);
-
-// fclose(fp);
-
-// printf("\n\nRegistration Successfully Done!\n");
-// printf("Your Details:\nName: %s,\nPhone Number: %s,\nAge: %d,\nEmail: %s,\n Weight: %.2f,\nPassword: ********\n",name, phone, age, email, weight, password);
-// printf("/nIf you want to see your password please press 1, Otherwise press 2 to login to our software.\n");
-// int postOption;
-// scanf("%d", &postOption);
-// if (postOption == 1) {
-//     printf("Your Password is: %s\n", password);
-
-// }else if (postOption == 2) {
-//     printf("You can now login to our software.\n");
-//     //loginOption();
-// }
-// }
-
-
 void registerPatient() {
     FILE *fp = fopen("patients.txt", "a");
     if (fp == NULL) {
@@ -424,4 +360,351 @@ void registerPatient() {
         defaultPage();
     }
   
+}
+
+
+/*
+ ____    _    ____  _   _ ____   ___    _    ____  ____  ____  
+|  _ \  / \  / ___|| | | | __ ) / _ \  / \  |  _ \|  _ \/ ___| 
+| | | |/ _ \ \___ \| |_| |  _ \| | | |/ _ \ | |_) | | | \___ \ 
+| |_| / ___ \ ___) |  _  | |_) | |_| / ___ \|  _ <| |_| |___) |
+|____/_/   \_\____/|_| |_|____/ \___/_/   \_\_| \_\____/|____/ 
+*/
+void patientDashboard(char name[], char phone[]) {
+    int option;
+    char input[10];
+    
+    while(1) {
+        printf("\nPATIENT DASHBOARD\n\n");
+        printf("1: Book Appointment\n");
+        printf("2: View Appointments\n");
+        printf("3: Cancel Appointments\n");
+        printf("4: Logout\n");
+        printf("Type 'back' at any time to return to this menu\n");
+
+        printf("\nPlease select your option (1-4): ");
+        scanf("%s", input);
+        
+        // Check for back command
+        if (checkForBackCommand(input)) {
+            printf("\nYou're already at the main menu.\n");
+            continue;
+        }
+        
+        // Convert input to integer
+        option = atoi(input);
+        
+        switch(option) {
+            case 1:
+                if(appointmentForm(phone)) {
+                    printf("\nReturning to patient dashboard...\n");
+                }
+                break;
+            case 2:
+                // if(viewAppointments(phone)) {
+                //     printf("\nReturning to patient dashboard...\n");
+                // }
+                break;
+            case 3:
+                // if(cancelAppointment(phone)) {
+                //     printf("\nReturning to patient dashboard...\n");
+                // }
+                break;
+            case 4:
+                printf("Logging out...\n");
+                defaultPage();
+                return;
+            default:
+                printf("Invalid option. Please try again.\n");
+        }
+    }
+}
+
+void doctorDashboard(char name[], char phone[]) {
+    int option;
+    char input[10];
+    
+    while(1) {
+        printf("\nDOCTOR DASHBOARD\n\n");
+        printf("1: View Scheduled Appointments\n");
+        printf("2: View Patient Details\n");
+        printf("3: Write Prescription\n");
+        printf("4: Logout\n");
+        printf("Type 'back' at any time to return to this menu\n");
+
+        printf("\nPlease select your option (1-4): ");
+        scanf("%s", input);
+        
+        if (checkForBackCommand(input)) {
+            printf("\nYou're already at the main menu.\n");
+            continue;
+        }
+        
+        option = atoi(input);
+        
+        switch(option) {
+            case 1:
+                if(viewDoctorAppointments(phone)) {
+                    printf("\nReturning to doctor dashboard...\n");
+                }
+                break;
+            case 2:
+                // if(viewPatientDetails()) {
+                //     printf("\nReturning to doctor dashboard...\n");
+                // }
+                break;
+            case 3:
+                // if(writePrescription(phone)) {
+                //     printf("\nReturning to doctor dashboard...\n");
+                // }
+                break;
+            case 4:
+                printf("Logging out...\n");
+                return;
+            default:
+                printf("Invalid option. Please try again.\n");
+        }
+    }
+}
+
+void adminDashboard(char name[], char phone[]) {
+    int option;
+    char input[10];
+    
+    while(1) {
+        printf("\nADMIN DASHBOARD\n\n");
+        printf("1: View All Appointments\n");
+        printf("2: View Patients\n");
+        printf("3: Edit Patients\n");
+        printf("4: Delete Patients\n");
+        printf("5: Add Doctors\n");
+        printf("6: Remove Doctors\n");
+        printf("7: Logout\n");
+        printf("Type 'back' at any time to return to this menu\n");
+
+        printf("\nPlease select your option (1-7): ");
+        scanf("%s", input);
+        
+        if (checkForBackCommand(input)) {
+            printf("\nYou're already at the main menu.\n");
+            continue;
+        }
+        
+        option = atoi(input);
+        
+        switch(option) {
+            case 1:
+                // if(viewAllAppointments()) {
+                //     printf("\nReturning to admin dashboard...\n");
+                // }
+                break;
+            case 2:
+                // if(viewPatients()) {
+                //     printf("\nReturning to admin dashboard...\n");
+                // }
+                break;
+            case 3:
+                // if(editPatients()) {
+                //     printf("\nReturning to admin dashboard...\n");
+                // }
+                break;
+            case 4:
+                // if(deletePatients()) {
+                //     printf("\nReturning to admin dashboard...\n");
+                // }
+                break;
+            case 5:
+                // if(addDoctors()) {
+                //     printf("\nReturning to admin dashboard...\n");
+                // }
+                break;
+            case 6:
+                // if(removeDoctors()) {
+                //     printf("\nReturning to admin dashboard...\n");
+                // }
+                break;
+            case 7:
+                printf("Logging out...\n");
+                return;
+            default:
+                printf("Invalid option. Please try again.\n");
+        }
+    }
+}
+
+/*
+ ▄█        ▄██████▄     ▄██████▄   ▄█  ███▄▄▄▄  
+███       ███    ███   ███    ███ ███  ███▀▀▀██▄
+███       ███    ███   ███    █▀  ███▌ ███   ███
+███       ███    ███  ▄███        ███▌ ███   ███
+███       ███    ███ ▀▀███ ████▄  ███▌ ███   ███
+███       ███    ███   ███    ███ ███  ███   ███
+███▌    ▄ ███    ███   ███    ███ ███  ███   ███
+█████▄▄██  ▀██████▀    ████████▀  █▀    ▀█   █▀ 
+▀                                               
+*/
+int loginPatient(){
+//jeta diye login korbe, etar pore email er o option rakhte hobe
+
+char phone[20], password[30];
+    //Jeta diye data compare korbo
+    char fPhone[20], fPassword[30], name[100], email[100];
+    int age;
+    float weight;
+printf("Patient Login Form: \n");
+    printf("Phone Number: ");
+    scanf("%s", phone);
+
+    printf("Password: ");
+    //MASKED
+    inputPassword(password, sizeof(password));
+
+    FILE *fp = fopen("patients.txt", "r");
+    if (fp == NULL) {
+        printf("Unable to open patients.txtt to read.\n");
+        return 0;
+    }
+     int found = 0;
+    while (fscanf(fp, "%[^,],%[^,],%[^,],%d,%[^,],%f\n", fPhone, fPassword, name, &age, email, &weight) != EOF) {
+        if (strcmp(fPhone, phone) == 0 && strcmp(fPassword, password) == 0) {
+            found = 1;
+            break;
+        }
+    }
+    fclose(fp);
+
+     if (found) {
+        printf("\nLogin successful! Welcome to our software, Patient %s!\n", name);
+        patientDashboard(name, fPhone);
+        // Ekhane Patient Dashboard dekhate hobe, jemon Get a New Appointment, View Your Appointments, Cancel a Appointment
+        return 1;
+    } else {
+        printf("\nInvalid phone or password. Try again.\n");
+        return 0;
+    }
+
+
+}
+
+int loginDoctor(){
+char phone[20], password[30];
+    //Jeta diye data compare korbo
+    char fPhone[20], fPassword[30], name[100], email[100],specialization[100];
+    int age;
+    float weight;
+
+printf("Doctor Login Form: \n");
+    printf("Phone Number: ");
+    scanf("%s", phone);
+
+    printf("Password: ");
+    //scanf("%s", password);
+    //TEST MASKED CODE
+    inputPassword(password, sizeof(password));
+
+    FILE *fp = fopen("doctors.txt", "r");
+    if (fp == NULL) {
+        printf("Unable to open doctors.txtt to read.\n");
+        return 0;
+    }
+
+     int found = 0;
+    while (fscanf(fp, "%[^,],%[^,],%[^,],%d,%[^,],%f,%[^\n]\n", fPhone, fPassword, name, &age, email, &weight, specialization) != EOF) {
+        if (strcmp(fPhone, phone) == 0 && strcmp(fPassword, password) == 0) {
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(fp);
+
+     if (found) {
+        printf("\nLogin successful! Welcome to our software, Doctor %s!\n", name);
+        //EKhane Doctro Dashboard e niye jabo, jekhane appointments.txt theke appointment read korbe
+        doctorDashboard(name, fPhone);
+        return 1;
+    } else {
+        printf("\nInvalid phone or password. Try again.\n");
+        return 0;
+    }
+}
+
+int loginAdmin(){
+
+char phone[20], password[30];
+    //Jeta diye data compare korbo
+    char fPhone[20], fPassword[30], name[100], email[100];
+    int age;
+    float weight;
+
+printf("Admin Login Form: \n");
+    printf("Phone Number: ");
+    scanf("%s", phone);
+
+    printf("Password: ");
+    //scanf("%s", password);
+    //TEST MASKING
+    inputPassword(password, sizeof(password));
+    
+    FILE *fp = fopen("admins.txt", "r");
+    if (fp == NULL) {
+        printf("Unable to open adminss.txtt to read.\n");
+        return 0;
+    }
+
+     int found = 0;
+    while (fscanf(fp, "%[^,],%[^,],%[^,],%d,%[^,],%f\n", fPhone, fPassword, name, &age, email, &weight) != EOF) {
+        if (strcmp(fPhone, phone) == 0 && strcmp(fPassword, password) == 0) {
+            found = 1;
+            break;
+        }
+    }
+
+    fclose(fp);
+
+     if (found) {
+        printf("\nLogin successful! Welcome to our software, Admin %s!\n", name);
+        //EKhane Admin Dashboard e niye jabo, jekhane EMR, PAtient data, Cancellation, Generate Bill, shob kichur option thakbe
+            adminDashboard(name, fPhone);
+        return 1;
+    } else {
+        printf("\nInvalid phone or password. Try again.\n");
+        return 0;
+    }
+
+
+}
+
+void loginOption(){
+    printf("You have selected the login option.\n Please select your option from below.\n1. Login As Patient\n2. Login as Doctor\n3. Login as Admin\n4. Back to Main Menu\n");
+    int option;
+    printf("Enter Your Option: ");
+    scanf("%d",&option);
+    switch (option) {
+  case 1:
+    // code block
+    loginPatient();
+    break;
+  case 2:
+    // code block
+    loginDoctor();
+    break;
+  case 3:
+    loginAdmin();
+    break;
+    case 4:
+    printf("Returning to main menu...\n");
+    defaultPage();  
+}
+}
+
+void emergencyContacts() {
+    printf("\nEmergency Contacts:\n");
+    printf("1. Ambulance: 999\n");
+    printf("2. Fire Service: 101\n");
+    printf("3. Police: 100\n");
+    printf("4. Poison Control Center: 106\n");
+    printf("5. Local Hospital: 16263\n");
+    printf("6. Back to Main Menu\n");
+    
 }
