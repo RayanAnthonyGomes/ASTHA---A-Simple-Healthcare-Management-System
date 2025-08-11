@@ -466,50 +466,88 @@ void patientDashboard(char name[], char phone[]) {
     }
 }
 
+// void doctorDashboard(char name[], char phone[]) {
+//     int option;
+//     char input[10];
+    
+//     while(1) {
+//         printf("\nDOCTOR DASHBOARD\n\n");
+//         printf("1: View Scheduled Appointments\n");
+//         printf("2: View Patient Details\n");
+//         printf("3: Write Prescription\n");
+//         printf("4: Logout\n");
+//         printf("Type 'back' at any time to return to this menu\n");
+
+//         printf("\nPlease select your option (1-4): ");
+//         scanf("%s", input);
+        
+//         if (checkForBackCommand(input)) {
+//             printf("\nYou're already at the main menu.\n");
+//             continue;
+//         }
+        
+//         option = atoi(input);
+        
+//         switch(option) {
+//             case 1:
+//                 clearScreen();
+//                 //viewDoctorAppointments(phone);  
+//                 break;
+//             case 2:
+//                 clearScreen();
+//                 //viewPatientDetails();
+//                 break;
+//             case 3:
+//                 clearScreen();
+//                 //writePrescription(phone);
+//                 break;
+//             case 4:
+//                 printf("Logging out...\n");
+//                 return;
+//             default:
+//                 printf("Invalid option. Please try again.\n");
+//         }
+//     }
+// }
 void doctorDashboard(char name[], char phone[]) {
     int option;
     char input[10];
     
     while(1) {
-        printf("\nDOCTOR DASHBOARD\n\n");
-        printf("1: View Scheduled Appointments\n");
-        printf("2: View Patient Details\n");
-        printf("3: Write Prescription\n");
-        printf("4: Logout\n");
-        printf("Type 'back' at any time to return to this menu\n");
+        clearScreen();
+        printf("\n=== DOCTOR DASHBOARD ===\n");
+        printf("Welcome, Dr. %s\n\n", name);
+        printf("1. View Appointments\n");
+        printf("2. View Patient Details\n");
+        printf("3. Write Prescription\n");
+        printf("4. Logout\n");
 
-        printf("\nPlease select your option (1-4): ");
-        scanf("%s", input);
-        
-        if (checkForBackCommand(input)) {
-            printf("\nYou're already at the main menu.\n");
-            continue;
-        }
+        printf("\nSelect option (1-4): ");
+        scanf("%9s", input);
+        clearInputBuffer();
         
         option = atoi(input);
         
         switch(option) {
             case 1:
-                clearScreen();
-                //viewDoctorAppointments(phone);  
+                viewDoctorAppointments(phone);
                 break;
             case 2:
-                clearScreen();
-                //viewPatientDetails();
+                viewPatientDetails();
                 break;
             case 3:
-                clearScreen();
-                //writePrescription(phone);
+                writePrescription(phone);
                 break;
             case 4:
                 printf("Logging out...\n");
                 return;
             default:
                 printf("Invalid option. Please try again.\n");
+                printf("Press Enter to continue...");
+                clearInputBuffer();
         }
     }
 }
-
 void adminDashboard(char name[], char phone[]) {
     int option;
     char input[10];
@@ -1213,8 +1251,9 @@ void cancelAppointment(const char *patientPhone) {
 */
 
 
+// View Appointments for Doctor (Fixed)
 int viewDoctorAppointments(const char *doctorPhone) {
-    printf("\n--- Your Scheduled Appointments ---\n\n");
+    printf("\n--- Your Scheduled Appointments ---\n");
     
     FILE *fp = fopen("appointments.txt", "r");
     if (fp == NULL) {
@@ -1222,19 +1261,26 @@ int viewDoctorAppointments(const char *doctorPhone) {
         return 0;
     }
 
-    char aDoctorPhone[20], aPatientPhone[20], date[20], time[10], reason[100];
+    char line[512];
     int found = 0;
+    int serial = 1;
 
-    printf("%-20s %-20s %-15s %-10s %-30s\n", 
-           "Patient Phone", "Date", "Time", "Reason");
-    printf("----------------------------------------------------------------\n");
+    printf("\n%-5s %-20s %-15s %-10s %-30s\n", 
+           "No.", "Patient Phone", "Date", "Time", "Reason");
+    printf("------------------------------------------------------------\n");
 
-    while (fscanf(fp, "%[^,],%[^,],%[^,],%[^,],%[^\n]\n", 
-                 aDoctorPhone, aPatientPhone, date, time, reason) != EOF) {
-        if (strcmp(aDoctorPhone, doctorPhone) == 0) {
-            printf("%-20s %-20s %-15s %-10s %-30s\n", 
-                   aPatientPhone, date, time, reason);
-            found = 1;
+    while (fgets(line, sizeof(line), fp)) {
+        char dPhone[20], pPhone[20], date[20], time[10], reason[100];
+        char temp[100];
+        
+        // Properly parse the line
+        if (sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^\n]", 
+                  dPhone, pPhone, date, time, reason) == 5) {
+            if (strcmp(dPhone, doctorPhone) == 0) {
+                printf("%-5d %-20s %-15s %-10s %-30s\n", 
+                       serial++, pPhone, date, time, reason);
+                found = 1;
+            }
         }
     }
 
@@ -1244,23 +1290,30 @@ int viewDoctorAppointments(const char *doctorPhone) {
         printf("You have no scheduled appointments.\n");
     }
 
-    printf("\nPress Enter to return to dashboard...");
+    printf("\nPress Enter to return...");
     clearInputBuffer();
     return 1;
 }
 
-void displayPatientRecord(const char *patientPhone) {
+// View Patient Details (Fixed)
+int viewPatientDetails() {
+    char patientPhone[20];
+    
+    printf("\nEnter patient's phone number: ");
+    scanf("%19s", patientPhone);
+    clearInputBuffer();
+
     FILE *fp = fopen("patients.txt", "r");
     if (fp == NULL) {
-        printf("\nError accessing patient records.\n");
-        return;
+        printf("Error accessing patient records.\n");
+        return 0;
     }
 
     char pPhone[20], pPassword[30], name[100], email[100], bloodGroup[5], medicalHistory[500];
     int age;
     float weight, height;
-
     int found = 0;
+
     while (fscanf(fp, "%[^,],%[^,],%[^,],%d,%[^,],%f,%f,%[^,],%[^\n]\n", 
                  pPhone, pPassword, name, &age, email, &weight, &height, bloodGroup, medicalHistory) != EOF) {
         if (strcmp(pPhone, patientPhone) == 0) {
@@ -1281,111 +1334,55 @@ void displayPatientRecord(const char *patientPhone) {
     fclose(fp);
 
     if (!found) {
-        printf("\nPatient record not found.\n");
+        printf("Patient not found.\n");
     }
-}int viewPatientDetails() {
-    char patientPhone[20];
-    char input[20];
-    
-    while (1) {
-        printf("\nEnter patient's phone number (or 'back' to return): ");
-        scanf("%19s", input);
-        clearInputBuffer();
 
-        if (checkForBackCommand(input)) {
-            return 0;
-        }
-
-        strcpy(patientPhone, input);
-        displayPatientRecord(patientPhone);
-
-        printf("\n1. View another patient\n");
-        printf("2. Return to dashboard\n");
-        printf("Choose option: ");
-        
-        scanf("%19s", input);
-        clearInputBuffer();
-
-        if (strcmp(input, "2") == 0 || checkForBackCommand(input)) {
-            return 1;
-        }
-    }
+    printf("\nPress Enter to return...");
+    clearInputBuffer();
+    return 1;
 }
 
-// Write a new prescription
+// Write Prescription (Fixed)
 int writePrescription(const char *doctorPhone) {
-    char patientPhone[20], date[11], medication[500], dosage[100], instructions[500];
-    char input[20];
-    FILE *fp;
+    char patientPhone[20], date[11], medications[500], dosage[200], instructions[500];
+    
+    // Get current date
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+    strftime(date, sizeof(date), "%d-%m-%Y", t);
 
-    printf("\n--- Create New Prescription ---\n");
-
-    while (1) {
-        printf("Enter patient's phone number (or 'back' to cancel): ");
-        scanf("%19s", input);
-        clearInputBuffer();
-
-        if (checkForBackCommand(input)) {
-            return 0;
-        }
-
-        // Verify patient exists
-        fp = fopen("patients.txt", "r");
-        if (fp == NULL) {
-            printf("Error accessing patient records.\n");
-            continue;
-        }
-
-        char pPhone[20];
-        int found = 0;
-        while (fscanf(fp, "%[^,],%*[^\n]\n", pPhone) != EOF) {
-            if (strcmp(pPhone, input) == 0) {
-                found = 1;
-                break;
-            }
-        }
-        fclose(fp);
-
-        if (!found) {
-            printf("Patient not found. Please try again.\n");
-            continue;
-        }
-
-        strcpy(patientPhone, input);
-        break;
-    }
-
-    // Get current date (you could use system date here)
-    printf("Enter prescription date (DD-MM-YYYY): ");
-    scanf("%10s", date);
+    printf("\n--- New Prescription ---\n");
+    printf("Patient Phone: ");
+    scanf("%19s", patientPhone);
     clearInputBuffer();
 
-    printf("Enter medication names (comma separated): ");
-    fgets(medication, sizeof(medication), stdin);
-    trimNewline(medication);
+    printf("Medications (comma separated): ");
+    fgets(medications, sizeof(medications), stdin);
+    trimNewline(medications);
 
-    printf("Enter dosage for each medication: ");
+    printf("Dosage: ");
     fgets(dosage, sizeof(dosage), stdin);
     trimNewline(dosage);
 
-    printf("Enter instructions: ");
+    printf("Instructions: ");
     fgets(instructions, sizeof(instructions), stdin);
     trimNewline(instructions);
 
     // Save to prescriptions file
-    fp = fopen("prescriptions.txt", "a");
+    FILE *fp = fopen("prescriptions.txt", "a");
     if (fp == NULL) {
         printf("Error saving prescription.\n");
         return 0;
     }
 
     fprintf(fp, "%s,%s,%s,%s,%s,%s\n", 
-            doctorPhone, patientPhone, date, medication, dosage, instructions);
+            doctorPhone, patientPhone, date, medications, dosage, instructions);
     fclose(fp);
 
     printf("\nPrescription saved successfully!\n");
     printf("Press Enter to continue...");
     clearInputBuffer();
-
     return 1;
 }
+
+// Doctor Dashboard (Fixed)
