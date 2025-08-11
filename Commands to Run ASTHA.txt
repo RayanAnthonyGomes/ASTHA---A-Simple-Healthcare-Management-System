@@ -1,0 +1,14 @@
+Commands to Run ASTHA
+
+step 1:
+cd to directory
+
+cd C:/Users/ChuntuMiya/Desktop/ASTHA/ASTHA---A-Simple-Healthcare-Management-System
+main.exe
+
+Step 2: 
+DUMMY PATIENT LOGIN
+
+01644434552
+BMW$1000Rr 
+
