@@ -1,2 +1,6 @@
-phone,password,name,age,email,weight,height,bloodGroup,medicalHistory
-01644434552,BMW$1000Rr,Rayan Anthony Chuntu,21,rayangomes@gmail.com,72.20,1.67,O+,nai
+01644434552,BMW$1000Rr,Jaya Ahsan,45,jaya@gmail.com,54.00
+
+
+
+phone,password,name,age,email,weight,height
+

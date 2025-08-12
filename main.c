@@ -11,8 +11,6 @@
 
 //VERIFICATION AND SMALL INTERNAL MODULES
 
-
-
 //RANDOM TIME GENERATION FUNCTION
 int randomInRange(int min, int max) {
     return rand() % (max - min + 1) + min;
@@ -36,14 +34,12 @@ bool checkForBackCommand(const char* input) {
 bool validatePasswordWithFeedback(const char *password) {
     bool hasUpper = false, hasLower = false, hasDigit = false, hasSpecial = false;
     int length = strlen(password);
-    
     // Check length first
     if (length < 8) {
         printf("Too short password.(minimun 8 characters is the standard password)\n");
         return false;
     }
-    
-    // Check each requirement
+    // Prottek Ta Requirements Check kortesi? How? Ctype.h use korar jonno eta possible hoise 
     for (int i = 0; i < length; i++) {
         if (isupper(password[i])) hasUpper = true;
         else if (islower(password[i])) hasLower = true;
@@ -75,7 +71,7 @@ bool validatePasswordWithFeedback(const char *password) {
 
 //Bangladeshi phone validation
 bool isValidBangladeshiPhone(const char *phone) {
-    // Must be exactly 11 digits and start with 01
+    //exactly 11 digits and start with 01
     if (strlen(phone) != 11) {
         printf("Must be exactly 11 digits\n");
         return false;
@@ -107,7 +103,6 @@ bool isValidEmail(const char *email) {
         if (email[i] == '@') atCount++;
         else if (email[i] == '.') dotCount++;
     }
-    
     return (atCount == 1) && (dotCount >= 1);
 }
 
@@ -151,9 +146,7 @@ void inputPassword(char *password, int maxLength) {
 }
 
 void emergencyContacts(void);
-
 void viewAppointments(const char *patientPhone);
-
 int viewDoctorAppointments(const char *doctorPhone);
 int viewPatientDetails();
 int writePrescription(const char *doctorPhone);
@@ -165,6 +158,7 @@ void trimNewline(char *str) {
         str[len-1] = '\0';
     }
 }
+
 void clearInputBuffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF);
@@ -172,16 +166,9 @@ void clearInputBuffer() {
 
 // void viewPrescribedMedicine(const char *patientPhone);
 // int patientExit(const char *patientPhone);
-
-
-/*
- ____  _____ _____ _   _   _ _   _____  __     _____ _______        __
-|  _ \| ____|  ___/ \ | | | | | |_   _| \ \   / /_ _| ____\ \      / /
-| | | |  _| | |_ / _ \| | | | |   | |    \ \ / / | ||  _|  \ \ /\ / / 
-| |_| | |___|  _/ ___ \ |_| | |___| |     \ V /  | || |___  \ V  V /  
-|____/|_____|_|/_/   \_\___/|_____|_|      \_/  |___|_____|  \_/\_/   
-*/
 // Function to get console width
+
+//Pardon
 int getConsoleWidth() {
     CONSOLE_SCREEN_BUFFER_INFO csbi;
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
@@ -198,6 +185,14 @@ void printCentered(const char *text) {
     for (int i = 0; i < padding; i++) printf(" ");
     printf("%s", text);
 }
+
+/*
+ ____  _____ _____ _   _   _ _   _____  __     _____ _______        __
+|  _ \| ____|  ___/ \ | | | | | |_   _| \ \   / /_ _| ____\ \      / /
+| | | |  _| | |_ / _ \| | | | |   | |    \ \ / / | ||  _|  \ \ /\ / / 
+| |_| | |___|  _/ ___ \ |_| | |___| |     \ V /  | || |___  \ V  V /  
+|____/|_____|_|/_/   \_\___/|_____|_|      \_/  |___|_____|  \_/\_/   
+*/
 /*
    █████████    █████████  ███████████ █████   █████   █████████  
   ███░░░░░███  ███░░░░░███░█░░░███░░░█░░███   ░░███   ███░░░░░███ 
@@ -210,19 +205,17 @@ void printCentered(const char *text) {
 */
 void defaultPage() {
     printf("\033[1;36m");  // Bold + Cyan
-    printCentered("....###.....######..########.##.....##....###.......###...\n");
-    printCentered("...##.##...##....##....##....##.....##...##.##.....##.##..\n");
-    printCentered("..##...##..##..........##....##.....##..##...##...##...##.\n");
-    printCentered(".##.....##..######.....##....#########.##.....##.##.....##\n");
-    printCentered(".#########.......##....##....##.....##.#########.#########\n");
-    printCentered(".##.....##.##....##....##....##.....##.##.....##.##.....##\n");
-    printCentered(".##.....##..######.....##....##.....##.##.....##.##.....##\n");
+    printCentered("    ###     ######  ######## ##     ##    ###       ###   \n");
+    printCentered("   ## ##   ##    ##    ##    ##     ##   ## ##     ## ##  \n");
+    printCentered("  ##   ##  ##          ##    ##     ##  ##   ##   ##   ## \n");
+    printCentered(" ##     ##  ######     ##    ######### ##     ## ##     ##\n");
+    printCentered(" #########       ##    ##    ##     ## ######### #########\n");
+    printCentered(" ##     ## ##    ##    ##    ##     ## ##     ## ##     ##\n");
+    printCentered(" ##     ##  ######     ##    ##     ## ##     ## ##     ##\n");
 
     printf("\033[0m"); // Reset color
     printf("\n");
     printCentered("Welcome to \"ASTHAA\". In Simplicity, We Trust!\n");
-    printf("\n");
-    // For the menu options, we'll not center them 
     printf("\n");
     printf("Menu Options:\n");
     printf("1. Registration (For Patients Only)\n");
@@ -232,7 +225,6 @@ void defaultPage() {
     printf("5. Exit\n");
     printf("\n");
     printf("Enter any option (1-5) to continue: ");
-
 }
 
 //Global Functions gula ekhane dibo so that amader everytime out of scope na hoy
@@ -243,10 +235,18 @@ void patientDashboard(char name[], char phone[]);
 void doctorDashboard(char name[], char phone[]);
 void adminDashboard(char name[], char phone[]);
 //Function 2: Login option
+//patient
 void loginOption(void);
 bool appointmentForm(const char *patientPhone);
 void cancelAppointment(const char *patientPhone);
+//doc
+int viewDoctorAppointments(const char *doctorPhone);
+int viewPatientDetails(const char *doctorPhone);
+int writePrescription(const char *doctorPhone);
+//Function 3: Emergency Contacts
 void emergencyContacts(void);   
+
+
 
 int main() {
     defaultPage();
@@ -308,7 +308,7 @@ int main() {
 void registerPatient() {
     FILE *fp = fopen("patients.txt", "a");
     if (fp == NULL) {
-        printf("Error: Error Opening Patients Database. Please try again soon.\n");
+        printf("Error: Error Opening Patient Database. Please try again soon. I hope that our admins are on it right at this moment\n");
         return;
     }
 
@@ -533,7 +533,7 @@ void doctorDashboard(char name[], char phone[]) {
                 viewDoctorAppointments(phone);
                 break;
             case 2:
-                viewPatientDetails();
+                viewPatientDetails(phone);
                 break;
             case 3:
                 writePrescription(phone);
@@ -824,14 +824,14 @@ bool appointmentForm(const char *patientPhone) {
         return false;
     }
 
-    // Variables to store patient data
+    //store patient data
     char pName[100], pEmail[100], pPassword[30];
     int pAge;
     float pWeight;
     int patientFound = 0;
-    char input[100]; // Declare input buffer for user input
+    char input[100]; 
 
-    // Search for patient in database
+    // Search
     char tempPhone[20];
     while (fscanf(pfp, "%[^,],%[^,],%[^,],%d,%[^,],%f\n", 
                  tempPhone, pPassword, pName, &pAge, pEmail, &pWeight) != EOF) {
@@ -847,7 +847,7 @@ bool appointmentForm(const char *patientPhone) {
         return false;
     }
 
-    // Generate available dates
+    //available dates
     time_t t = time(NULL);
     struct tm currentDate = *localtime(&t);
     struct tm availableDates[5];
@@ -858,7 +858,7 @@ bool appointmentForm(const char *patientPhone) {
         mktime(&availableDates[i]);
     }
 
-    // Medical info
+    //Medicalinfo
     char bloodGroup[10], problem[300];
     float height, bmi;
 
@@ -1265,20 +1265,24 @@ int viewDoctorAppointments(const char *doctorPhone) {
     int found = 0;
     int serial = 1;
 
-    printf("\n%-5s %-20s %-15s %-10s %-30s\n", 
-           "No.", "Patient Phone", "Date", "Time", "Reason");
-    printf("------------------------------------------------------------\n");
+    printf("\n%-5s %-20s %-15s %-10s %-30s %-15s\n", 
+           "No.", "Patient Name", "Date", "Time", "Problem", "Specialization");
+    printf("----------------------------------------------------------------------------\n");
 
     while (fgets(line, sizeof(line), fp)) {
-        char dPhone[20], pPhone[20], date[20], time[10], reason[100];
-        char temp[100];
+        char pPhone[20], pName[50], pAge[10], pHeight[10], pWeight[10], 
+             bloodGroup[5], bmi[10], problem[100], 
+             dID[10], dName[50], specialization[50], date[20], time[10];
         
-        // Properly parse the line
-        if (sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^\n]", 
-                  dPhone, pPhone, date, time, reason) == 5) {
-            if (strcmp(dPhone, doctorPhone) == 0) {
-                printf("%-5d %-20s %-15s %-10s %-30s\n", 
-                       serial++, pPhone, date, time, reason);
+        // Parse all fields from the line
+        if (sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^\n]", 
+                  pPhone, pName, pAge, pHeight, pWeight, bloodGroup, bmi, problem,
+                  dID, dName, specialization, date, time) == 13) {
+            
+            // Check if this appointment belongs to the current doctor
+            if (strcmp(dID, doctorPhone) == 0) {
+                printf("%-5d %-20s %-15s %-10s %-30s %-15s\n", 
+                       serial++, pName, date, time, problem, specialization);
                 found = 1;
             }
         }
@@ -1294,68 +1298,175 @@ int viewDoctorAppointments(const char *doctorPhone) {
     clearInputBuffer();
     return 1;
 }
-
 // View Patient Details (Fixed)
-int viewPatientDetails() {
-    char patientPhone[20];
+int viewPatientDetails(const char *doctorPhone) {
+    printf("\n--- Your Patients ---\n");
     
-    printf("\nEnter patient's phone number: ");
-    scanf("%19s", patientPhone);
+    FILE *apptFile = fopen("appointments.txt", "r");
+    if (apptFile == NULL) {
+        printf("No appointments found.\n");
+        return 0;
+    }
+
+    char patients[100][20]; // Store patient phones
+    char patientNames[100][50]; // Store patient names
+    int patientCount = 0;
+    char line[512];
+
+    // Get patients for this doctor
+    while (fgets(line, sizeof(line), apptFile)) {
+        char pPhone[20], pName[50], dID[20];
+        if (sscanf(line, "%[^,],%[^,],%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%[^,]", 
+                  pPhone, pName, dID) >= 3) {
+            if (strcmp(dID, doctorPhone) == 0) {
+                // Check if patient already in list
+                int exists = 0;
+                for (int i = 0; i < patientCount; i++) {
+                    if (strcmp(patients[i], pPhone) == 0) {
+                        exists = 1;
+                        break;
+                    }
+                }
+                if (!exists && patientCount < 100) {
+                    strcpy(patients[patientCount], pPhone);
+                    strcpy(patientNames[patientCount], pName);
+                    patientCount++;
+                }
+            }
+        }
+    }
+    fclose(apptFile);
+
+    if (patientCount == 0) {
+        printf("You have no patients.\n");
+        printf("\nPress Enter to return...");
+        clearInputBuffer();
+        return 0;
+    }
+
+    // Display patient list
+    printf("\n%-5s %-20s %-15s\n", "No.", "Phone", "Name");
+    printf("---------------------------------\n");
+    for (int i = 0; i < patientCount; i++) {
+        printf("%-5d %-20s %-15s\n", i+1, patients[i], patientNames[i]);
+    }
+
+    // Let doctor select a patient
+    printf("\nEnter patient number (1-%d): ", patientCount);
+    int choice;
+    scanf("%d", &choice);
     clearInputBuffer();
 
-    FILE *fp = fopen("patients.txt", "r");
-    if (fp == NULL) {
+    if (choice < 1 || choice > patientCount) {
+        printf("Invalid selection.\n");
+        return 0;
+    }
+
+    // Now show full details of selected patient
+    FILE *patientFile = fopen("patients.txt", "r");
+    if (patientFile == NULL) {
         printf("Error accessing patient records.\n");
         return 0;
     }
 
-    char pPhone[20], pPassword[30], name[100], email[100], bloodGroup[5], medicalHistory[500];
-    int age;
-    float weight, height;
     int found = 0;
-
-    while (fscanf(fp, "%[^,],%[^,],%[^,],%d,%[^,],%f,%f,%[^,],%[^\n]\n", 
-                 pPhone, pPassword, name, &age, email, &weight, &height, bloodGroup, medicalHistory) != EOF) {
-        if (strcmp(pPhone, patientPhone) == 0) {
-            found = 1;
-            printf("\n--- Patient Medical Record ---\n");
-            printf("Name: %s\n", name);
-            printf("Phone: %s\n", pPhone);
-            printf("Age: %d\n", age);
-            printf("Weight: %.1f kg\n", weight);
-            printf("Height: %.1f cm\n", height);
-            printf("Blood Group: %s\n", bloodGroup);
-            printf("Email: %s\n", email);
-            printf("\nMedical History:\n%s\n", medicalHistory);
-            break;
+    while (fgets(line, sizeof(line), patientFile)) {
+        char pPhone[20], pPassword[30], name[100], email[100], bloodGroup[5], medicalHistory[500];
+        int age;
+        float weight, height, bmi;
+        
+        if (sscanf(line, "%[^,],%[^,],%[^,],%d,%[^,],%f,%f,%[^,],%f,%[^\n]", 
+                  pPhone, pPassword, name, &age, email, &weight, &height, bloodGroup, &bmi, medicalHistory) >= 9) {
+            if (strcmp(pPhone, patients[choice-1]) == 0) {
+                found = 1;
+                printf("\n--- Patient Medical Record ---\n");
+                printf("Name: %s\n", name);
+                printf("Phone: %s\n", pPhone);
+                printf("Age: %d\n", age);
+                printf("Weight: %.1f kg\n", weight);
+                printf("Height: %.1f cm\n", height);
+                printf("BMI: %.1f\n", bmi);
+                printf("Blood Group: %s\n", bloodGroup);
+                printf("Email: %s\n", email);
+                printf("\nMedical History:\n%s\n", medicalHistory);
+                break;
+            }
         }
     }
-
-    fclose(fp);
+    fclose(patientFile);
 
     if (!found) {
-        printf("Patient not found.\n");
+        printf("Patient details not found.\n");
     }
 
     printf("\nPress Enter to return...");
     clearInputBuffer();
     return 1;
 }
-
-// Write Prescription (Fixed)
+// Doctor Dashboard (Fixed)
 int writePrescription(const char *doctorPhone) {
-    char patientPhone[20], date[11], medications[500], dosage[200], instructions[500];
+    // First show doctor's upcoming appointments
+    printf("\n--- Your Appointments ---\n");
+    
+    FILE *apptFile = fopen("appointments.txt", "r");
+    if (apptFile == NULL) {
+        printf("No appointments found.\n");
+        return 0;
+    }
+
+    char patients[100][20]; // Store patient phones
+    char patientNames[100][50]; // Store patient names
+    int patientCount = 0;
+    char line[512];
+
+    printf("\n%-5s %-20s %-15s\n", "No.", "Phone", "Name");
+    printf("---------------------------------\n");
+
+    while (fgets(line, sizeof(line), apptFile)) {
+        char pPhone[20], pName[50], dID[20], date[20], time[10];
+        if (sscanf(line, "%[^,],%[^,],%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%[^,],%*[^,],%*[^,],%[^,],%[^\n]", 
+                  pPhone, pName, dID, date, time) >= 5) {
+            if (strcmp(dID, doctorPhone) == 0) {
+                strcpy(patients[patientCount], pPhone);
+                strcpy(patientNames[patientCount], pName);
+                printf("%-5d %-20s %-15s (Appt: %s %s)\n", 
+                      patientCount+1, pPhone, pName, date, time);
+                patientCount++;
+            }
+        }
+    }
+    fclose(apptFile);
+
+    if (patientCount == 0) {
+        printf("You have no appointments.\n");
+        printf("\nPress Enter to return...");
+        clearInputBuffer();
+        return 0;
+    }
+
+    // Get patient selection
+    printf("\nEnter patient number (1-%d): ", patientCount);
+    int choice;
+    scanf("%d", &choice);
+    clearInputBuffer();
+
+    if (choice < 1 || choice > patientCount) {
+        printf("Invalid selection.\n");
+        return 0;
+    }
+
+    char patientPhone[20];
+    strcpy(patientPhone, patients[choice-1]);
+
+    // Get prescription details
+    char date[11], medications[500], dosage[200], instructions[500];
     
     // Get current date
     time_t now = time(NULL);
     struct tm *t = localtime(&now);
     strftime(date, sizeof(date), "%d-%m-%Y", t);
 
-    printf("\n--- New Prescription ---\n");
-    printf("Patient Phone: ");
-    scanf("%19s", patientPhone);
-    clearInputBuffer();
-
+    printf("\n--- New Prescription for %s ---\n", patientNames[choice-1]);
     printf("Medications (comma separated): ");
     fgets(medications, sizeof(medications), stdin);
     trimNewline(medications);
@@ -1384,5 +1495,3 @@ int writePrescription(const char *doctorPhone) {
     clearInputBuffer();
     return 1;
 }
-
-// Doctor Dashboard (Fixed)
