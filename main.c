@@ -245,6 +245,9 @@ int viewPatientDetails(const char *doctorPhone);
 int writePrescription(const char *doctorPhone);
 //Function 3: Emergency Contacts
 void emergencyContacts(void);   
+int editPatientRecord();
+int viewAllPatients();
+int viewAllAppointments();
 
 
 
@@ -466,49 +469,7 @@ void patientDashboard(char name[], char phone[]) {
     }
 }
 
-// void doctorDashboard(char name[], char phone[]) {
-//     int option;
-//     char input[10];
-    
-//     while(1) {
-//         printf("\nDOCTOR DASHBOARD\n\n");
-//         printf("1: View Scheduled Appointments\n");
-//         printf("2: View Patient Details\n");
-//         printf("3: Write Prescription\n");
-//         printf("4: Logout\n");
-//         printf("Type 'back' at any time to return to this menu\n");
 
-//         printf("\nPlease select your option (1-4): ");
-//         scanf("%s", input);
-        
-//         if (checkForBackCommand(input)) {
-//             printf("\nYou're already at the main menu.\n");
-//             continue;
-//         }
-        
-//         option = atoi(input);
-        
-//         switch(option) {
-//             case 1:
-//                 clearScreen();
-//                 //viewDoctorAppointments(phone);  
-//                 break;
-//             case 2:
-//                 clearScreen();
-//                 //viewPatientDetails();
-//                 break;
-//             case 3:
-//                 clearScreen();
-//                 //writePrescription(phone);
-//                 break;
-//             case 4:
-//                 printf("Logging out...\n");
-//                 return;
-//             default:
-//                 printf("Invalid option. Please try again.\n");
-//         }
-//     }
-// }
 void doctorDashboard(char name[], char phone[]) {
     int option;
     char input[10];
@@ -575,19 +536,18 @@ void adminDashboard(char name[], char phone[]) {
         
         switch(option) {
             case 1:
-                // if(viewAllAppointments()) {
-                //     printf("\nReturning to admin dashboard...\n");
-                // }
+                clearScreen();
+                 viewAllAppointments();
                 break;
             case 2:
-                // if(viewPatients()) {
-                //     printf("\nReturning to admin dashboard...\n");
-                // }
+                clearScreen();
+                viewAllPatients();
                 break;
             case 3:
-                // if(editPatients()) {
-                //     printf("\nReturning to admin dashboard...\n");
-                // }
+                clearScreen();
+                if(editPatientRecord()) {
+                    printf("\nReturning to admin dashboard...\n");
+                }
                 break;
             case 4:
                 // if(deletePatients()) {
@@ -1492,6 +1452,106 @@ int writePrescription(const char *doctorPhone) {
 
     printf("\nPrescription saved successfully!\n");
     printf("Press Enter to continue...");
+    clearInputBuffer();
+    return 1;
+}
+
+/*
+ADMIN MODULES
+
+*/
+
+int viewAllAppointments() {
+    printf("\n╔══════════════════════════════════╗\n");
+    printf("║      ALL SCHEDULED APPOINTMENTS  ║\n");
+    printf("╚══════════════════════════════════╝\n");
+    
+    FILE *fp = fopen("appointments.txt", "r");
+    if (fp == NULL) {
+        printf("\nNo appointments found.\n");
+        return 0;
+    }
+
+    printf("\n%-5s %-15s %-20s %-15s %-10s %-15s %-30s\n", 
+           "No.", "Patient Phone", "Patient Name", "Doctor ID", "Date", "Time", "Reason");
+    printf("══════════════════════════════════════════════════════════════════════════════════\n");
+
+    char line[512];
+    int count = 0;
+    while (fgets(line, sizeof(line), fp)) {
+        char pPhone[20], pName[50], pAge[10], pHeight[10], pWeight[10], 
+             bloodGroup[5], bmi[10], problem[100], 
+             dID[10], dName[50], specialization[50], date[20], time[10];
+        
+        if (sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^,],%[^\n]", 
+                  pPhone, pName, pAge, pHeight, pWeight, bloodGroup, bmi, problem,
+                  dID, dName, specialization, date, time) == 13) {
+            printf("%-5d %-15s %-20s %-15s %-10s %-15s %-30s\n", 
+                   ++count, pPhone, pName, dID, date, time, problem);
+        }
+    }
+    fclose(fp);
+
+    if (count == 0) {
+        printf("No appointments found in the system.\n");
+    }
+
+    printf("\nPress Enter to return...");
+    clearInputBuffer();
+    return 1;
+}
+
+int viewAllPatients() {
+    printf("\n╔══════════════════════════╗\n");
+    printf("║      ALL PATIENTS       ║\n");
+    printf("╚══════════════════════════╝\n");
+    
+    FILE *fp = fopen("patients.txt", "r");
+    if (fp == NULL) {
+        printf("\nNo patient records found.\n");
+        return 0;
+    }
+
+    printf("\n%-5s %-15s %-20s %-5s %-10s %-10s %-5s %-10s\n", 
+           "No.", "Phone", "Name", "Age", "Weight", "Height", "BMI", "Blood Group");
+    printf("══════════════════════════════════════════════════════════════\n");
+
+    char line[512];
+    int count = 0;
+    while (fgets(line, sizeof(line), fp)) {
+        char pPhone[20], pPassword[30], name[100], email[100], bloodGroup[5], medicalHistory[500];
+        int age;
+        float weight, height, bmi;
+        
+        if (sscanf(line, "%[^,],%[^,],%[^,],%d,%[^,],%f,%f,%[^,],%f,%[^\n]", 
+                  pPhone, pPassword, name, &age, email, &weight, &height, bloodGroup, &bmi, medicalHistory) >= 9) {
+            printf("%-5d %-15s %-20s %-5d %-10.1f %-10.1f %-5.1f %-10s\n", 
+                   ++count, pPhone, name, age, weight, height, bmi, bloodGroup);
+        }
+    }
+    fclose(fp);
+
+    if (count == 0) {
+        printf("No patients registered in the system.\n");
+    }
+
+    printf("\nPress Enter to return...");
+    clearInputBuffer();
+    return 1;
+}
+
+int editPatientRecord() {
+    viewAllPatients();
+    
+    char phone[20];
+    printf("\nEnter patient phone number to edit: ");
+    scanf("%19s", phone);
+    clearInputBuffer();
+
+    // Implementation would continue with edit functionality
+    printf("\nEdit functionality would be implemented here\n");
+    
+    printf("\nPress Enter to return...");
     clearInputBuffer();
     return 1;
 }
