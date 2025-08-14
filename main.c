@@ -248,7 +248,7 @@ void emergencyContacts(void);
 int editPatientRecord();
 int viewAllPatients();
 int viewAllAppointments();
-
+void viewPrescribedMedicines(const char *patientPhone);
 
 
 int main() {
@@ -457,12 +457,12 @@ void patientDashboard(char name[], char phone[]) {
                  break;
             case 4:
                 printf("Viewing prescribed medicines...\n");
-                //viewPrescribedMedicines(phone);
+                viewPrescribedMedicines(phone);
                 break;
 
             case 5:
                 printf("Logging out...\nExiting the dashboard...\n");
-                defaultPage();
+                return;
             default:
                 printf("Invalid option. Please try again.\n");
         }
@@ -1183,6 +1183,118 @@ void cancelAppointment(const char *patientPhone) {
 
     printf("\nAppointment successfully cancelled!\n");
     printf("Press any key to continue...");
+    getch();
+}
+
+// Function to view prescribed medicines for a patient
+void viewPrescribedMedicines(const char *patientPhone) {
+    clearScreen();
+    printf("\n=== YOUR PRESCRIBED MEDICINES ===\n");
+    
+    FILE *fp = fopen("prescriptions.txt", "r");
+    if (fp == NULL) {
+        printf("No prescriptions found.\n");
+        printf("\nPress any key to return...");
+        getch();
+        return;
+    }
+
+    char line[512];
+    int found = 0;
+    int prescriptionCount = 0;
+
+    // First, get patient name from patients.txt
+    char patientName[100] = "Unknown";
+    FILE *patientFile = fopen("patients.txt", "r");
+    if (patientFile != NULL) {
+        char pPhone[20], pPassword[30], name[100], email[100];
+        int age;
+        float weight;
+        
+        while (fscanf(patientFile, "%[^,],%[^,],%[^,],%d,%[^,],%f\n", 
+                     pPhone, pPassword, name, &age, email, &weight) != EOF) {
+            if (strcmp(pPhone, patientPhone) == 0) {
+                strcpy(patientName, name);
+                break;
+            }
+        }
+        fclose(patientFile);
+    }
+
+    printf("\nPatient: %s (%s)\n\n", patientName, patientPhone);
+    printf("%-5s %-12s %-25s %-20s %-50s\n", 
+           "No.", "Date", "Doctor ID", "Medications", "Instructions");
+    printf("------------------------------------------------------------------------------------------------\n");
+
+    while (fgets(line, sizeof(line), fp)) {
+        char dPhone[20], pPhone[20], date[20], medications[500], dosage[200], instructions[500];
+        
+        if (sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^,],%[^\n]", 
+                  dPhone, pPhone, date, medications, dosage, instructions) == 6) {
+            if (strcmp(pPhone, patientPhone) == 0) {
+                found = 1;
+                prescriptionCount++;
+                
+                // Truncate long strings for display
+                char shortMeds[25] = {0};
+                strncpy(shortMeds, medications, 24);
+                if (strlen(medications) > 24) strcat(shortMeds, "...");
+                
+                char shortInstr[50] = {0};
+                strncpy(shortInstr, instructions, 49);
+                if (strlen(instructions) > 49) strcat(shortInstr, "...");
+                
+                printf("%-5d %-12s %-25s %-20s %-50s\n", 
+                       prescriptionCount, date, dPhone, shortMeds, shortInstr);
+            }
+        }
+    }
+    fclose(fp);
+
+    if (!found) {
+        printf("No prescriptions found for your account.\n");
+        printf("\nPress any key to return...");
+        getch();
+        return;
+    }
+
+    // Option to view details of a specific prescription
+    printf("\nEnter prescription number to view details (0 to go back): ");
+    int choice;
+    scanf("%d", &choice);
+    getchar(); // Consume newline
+
+    if (choice > 0 && choice <= prescriptionCount) {
+        // Reopen file to find the selected prescription
+        fp = fopen("prescriptions.txt", "r");
+        if (fp != NULL) {
+            int current = 0;
+            while (fgets(line, sizeof(line), fp)) {
+                char dPhone[20], pPhone[20], date[20], medications[500], dosage[200], instructions[500];
+                
+                if (sscanf(line, "%[^,],%[^,],%[^,],%[^,],%[^,],%[^\n]", 
+                          dPhone, pPhone, date, medications, dosage, instructions) == 6) {
+                    if (strcmp(pPhone, patientPhone) == 0) {
+                        current++;
+                        if (current == choice) {
+                            clearScreen();
+                            printf("\n=== PRESCRIPTION DETAILS ===\n");
+                            printf("\nPatient: %s (%s)\n", patientName, patientPhone);
+                            printf("Date: %s\n", date);
+                            printf("Doctor ID: %s\n", dPhone);
+                            printf("\nMedications:\n%s\n", medications);
+                            printf("\nDosage:\n%s\n", dosage);
+                            printf("\nInstructions:\n%s\n", instructions);
+                            break;
+                        }
+                    }
+                }
+            }
+            fclose(fp);
+        }
+    }
+
+    printf("\nPress any key to return...");
     getch();
 }
 
