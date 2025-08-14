@@ -150,7 +150,9 @@ void viewAppointments(const char *patientPhone);
 int viewDoctorAppointments(const char *doctorPhone);
 int viewPatientDetails();
 int writePrescription(const char *doctorPhone);
-
+int deletePatients();
+int addDoctors();
+int removeDoctors();
 
 void trimNewline(char *str) {
     int len = strlen(str);
@@ -550,19 +552,22 @@ void adminDashboard(char name[], char phone[]) {
                 }
                 break;
             case 4:
-                // if(deletePatients()) {
-                //     printf("\nReturning to admin dashboard...\n");
-                // }
+                clearScreen();
+                if(deletePatients()) {
+                    printf("\nReturning to admin dashboard...\n");
+                }
                 break;
             case 5:
-                // if(addDoctors()) {
-                //     printf("\nReturning to admin dashboard...\n");
-                // }
+                clearScreen();    
+            if(addDoctors()) {
+                    printf("\nReturning to admin dashboard...\n");
+                }
                 break;
             case 6:
-                // if(removeDoctors()) {
-                //     printf("\nReturning to admin dashboard...\n");
-                // }
+                clearScreen();
+            if(removeDoctors()) {
+                    printf("\nReturning to admin dashboard...\n");
+                }
                 break;
             case 7:
                 printf("Logging out...\n");
@@ -1661,9 +1666,297 @@ int editPatientRecord() {
     clearInputBuffer();
 
     // Implementation would continue with edit functionality
-    printf("\nEdit functionality would be implemented here\n");
-    
+    printf("\nEdit functionality\n");
+    printf("Please open the patients.txt file to edit the record manually.\n");
     printf("\nPress Enter to return...");
+    clearInputBuffer();
+    return 1;
+}
+
+int deletePatients() {
+    // প্রথমে সব রোগী দেখাবে
+    viewAllPatients();
+    
+    char phone[20];
+    printf("\nEnter patient phone number to delete (or 'back' to cancel): ");
+    scanf("%19s", phone);
+    clearInputBuffer();
+    
+    if (checkForBackCommand(phone)) {
+        printf("Deletion cancelled.\n");
+        return 0;
+    }
+
+    // রোগী খুঁজে বের করা
+    FILE *fp = fopen("patients.txt", "r");
+    if (fp == NULL) {
+        printf("Error opening patients database.\n");
+        return 0;
+    }
+
+    char tempFile[] = "temp_patients.txt";
+    FILE *tempFp = fopen(tempFile, "w");
+    if (tempFp == NULL) {
+        printf("Error creating temporary file.\n");
+        fclose(fp);
+        return 0;
+    }
+
+    char line[512];
+    int found = 0;
+    char deletedName[100] = "";
+
+    while (fgets(line, sizeof(line), fp)) {
+        char pPhone[20], pPassword[30], name[100], email[100];
+        int age;
+        float weight;
+        
+        if (sscanf(line, "%[^,],%[^,],%[^,],%d,%[^,],%f", 
+                  pPhone, pPassword, name, &age, email, &weight) >= 6) {
+            if (strcmp(pPhone, phone) == 0) {
+                found = 1;
+                strcpy(deletedName, name);
+                continue; // এই লাইন টেম্প ফাইলে লেখা হবে না (ডিলিট)
+            }
+        }
+        fprintf(tempFp, "%s", line);
+    }
+
+    fclose(fp);
+    fclose(tempFp);
+
+    if (!found) {
+        remove(tempFile);
+        printf("Patient not found with phone: %s\n", phone);
+        return 0;
+    }
+
+    // মূল ফাইল রিপ্লেস করা
+    remove("patients.txt");
+    rename(tempFile, "patients.txt");
+
+    printf("\nPatient '%s' (Phone: %s) deleted successfully!\n", deletedName, phone);
+    
+    // সংশ্লিষ্ট অ্যাপয়েন্টমেন্টও ডিলিট করা
+    FILE *apptFp = fopen("appointments.txt", "r");
+    if (apptFp != NULL) {
+        FILE *tempAppt = fopen("temp_appointments.txt", "w");
+        if (tempAppt != NULL) {
+            while (fgets(line, sizeof(line), apptFp)) {
+                char pPhone[20];
+                if (sscanf(line, "%19[^,]", pPhone) == 1 && strcmp(pPhone, phone) != 0) {
+                    fprintf(tempAppt, "%s", line);
+                }
+            }
+            fclose(tempAppt);
+            fclose(apptFp);
+            remove("appointments.txt");
+            rename("temp_appointments.txt", "appointments.txt");
+        }
+    }
+
+    printf("\nPress Enter to continue...");
+    clearInputBuffer();
+    return 1;
+}
+
+int addDoctors() {
+    clearScreen();
+    printf("\n=== ADD NEW DOCTOR ===\n");
+    
+    char name[100], email[100], phone[20], password[30], specialization[100];
+    int age;
+    float weight;
+
+    // Name
+    printf("\nDoctor's Full Name: ");
+    fflush(stdin);
+    fgets(name, sizeof(name), stdin);
+    name[strcspn(name, "\n")] = '\0';
+
+    // Age
+    while (1) {
+        printf("Age: ");
+        if (scanf("%d", &age) != 1 || age < 25 || age > 80) {
+            printf("Invalid age (25-80 only)!!\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        break;
+    }
+
+    // Weight
+    while (1) {
+        printf("Weight (kg): ");
+        if (scanf("%f", &weight) != 1 || weight < 40 || weight > 150) {
+            printf("Invalid weight (40-150 kg only)!!\n");
+            while (getchar() != '\n');
+            continue;
+        }
+        break;
+    }
+
+    // Phone verification
+    while (1) {
+        printf("Phone (01XXXXXXXXX): ");
+        scanf("%s", phone);
+        if (isValidBangladeshiPhone(phone)) break;
+    }
+
+    // Email verification
+    while (1) {
+        printf("Email: ");
+        scanf("%s", email);
+        if (isValidEmail(email)) break;
+    }
+
+    // Specialization
+    printf("Specialization: ");
+    scanf("%s", specialization);
+
+    // Password
+    printf("\nSet Password for Doctor: ");
+    inputPassword(password, sizeof(password));
+
+    // Save to doctors.txt
+    FILE *fp = fopen("doctors.txt", "a");
+    if (fp == NULL) {
+        printf("Error: Could not open doctors database\n");
+        return 0;
+    }
+
+    fprintf(fp, "%s,%s,%s,%d,%s,%.2f,%s\n", 
+            phone, password, name, age, email, weight, specialization);
+    fclose(fp);
+
+    printf("\nNew doctor '%s' added successfully!\n", name);
+    printf("Specialization: %s\n", specialization);
+    printf("Login Phone: %s\n", phone);
+    
+    printf("\nPress Enter to continue...");
+    clearInputBuffer();
+    return 1;
+}
+
+int removeDoctors() {
+    clearScreen();
+    printf("\n=== LIST OF DOCTORS ===\n");
+    
+    FILE *fp = fopen("doctors.txt", "r");
+    if (fp == NULL) {
+        printf("No doctors found in database.\n");
+        return 0;
+    }
+
+    printf("\n%-5s %-15s %-20s %-15s %-20s\n", 
+           "No.", "Phone", "Name", "Age", "Specialization");
+    printf("------------------------------------------------------------\n");
+
+    char line[512];
+    int count = 0;
+    char doctorPhones[50][20];
+    char doctorNames[50][100];
+
+    while (fgets(line, sizeof(line), fp)) {
+        char phone[20], password[30], name[100], email[100], specialization[100];
+        int age;
+        float weight;
+        
+        if (sscanf(line, "%[^,],%[^,],%[^,],%d,%[^,],%f,%[^\n]", 
+                  phone, password, name, &age, email, &weight, specialization) >= 7) {
+            strcpy(doctorPhones[count], phone);
+            strcpy(doctorNames[count], name);
+            printf("%-5d %-15s %-20s %-15d %-20s\n", 
+                   count+1, phone, name, age, specialization);
+            count++;
+        }
+    }
+    fclose(fp);
+
+    if (count == 0) {
+        printf("No doctors registered in the system.\n");
+        printf("\nPress Enter to continue...");
+        clearInputBuffer();
+        return 0;
+    }
+
+    // Doctor selection
+    printf("\nEnter doctor number to remove (1-%d, or 0 to cancel): ", count);
+    int choice;
+    scanf("%d", &choice);
+    clearInputBuffer();
+
+    if (choice < 1 || choice > count) {
+        printf("Operation cancelled.\n");
+        return 0;
+    }
+
+    char selectedPhone[20];
+    strcpy(selectedPhone, doctorPhones[choice-1]);
+
+    // Confirm deletion
+    printf("\nAre you sure you want to remove Dr. %s (%s)? (y/n): ", 
+           doctorNames[choice-1], selectedPhone);
+    char confirm;
+    scanf(" %c", &confirm);
+    clearInputBuffer();
+
+    if (tolower(confirm) != 'y') {
+        printf("Doctor removal cancelled.\n");
+        return 0;
+    }
+
+    // Remove from doctors.txt
+    FILE *tempFp = fopen("temp_doctors.txt", "w");
+    fp = fopen("doctors.txt", "r");
+    if (tempFp == NULL || fp == NULL) {
+        printf("Error accessing doctor database.\n");
+        if (tempFp) fclose(tempFp);
+        if (fp) fclose(fp);
+        return 0;
+    }
+
+    int removed = 0;
+    while (fgets(line, sizeof(line), fp)) {
+        char phone[20];
+        if (sscanf(line, "%19[^,]", phone) == 1 && strcmp(phone, selectedPhone) == 0) {
+            removed = 1;
+            continue;
+        }
+        fprintf(tempFp, "%s", line);
+    }
+
+    fclose(fp);
+    fclose(tempFp);
+
+    if (removed) {
+        remove("doctors.txt");
+        rename("temp_doctors.txt", "doctors.txt");
+        printf("\nDr. %s has been removed successfully!\n", doctorNames[choice-1]);
+        
+        // Remove doctor's appointments
+        FILE *apptFp = fopen("appointments.txt", "r");
+        if (apptFp != NULL) {
+            FILE *tempAppt = fopen("temp_appointments.txt", "w");
+            if (tempAppt != NULL) {
+                while (fgets(line, sizeof(line), apptFp)) {
+                    char dPhone[20];
+                    if (sscanf(line, "%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%*[^,],%19[^,]", dPhone) == 1 && strcmp(dPhone, selectedPhone) != 0) {
+                        fprintf(tempAppt, "%s", line);
+                    }
+                }
+                fclose(tempAppt);
+            }
+            fclose(apptFp);
+            remove("appointments.txt");
+            rename("temp_appointments.txt", "appointments.txt");
+        }
+    } else {
+        remove("temp_doctors.txt");
+        printf("Error: Doctor not found in database.\n");
+    }
+
+    printf("\nPress Enter to continue...");
     clearInputBuffer();
     return 1;
 }
