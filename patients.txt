@@ -5,3 +5,4 @@
 
 phone,password,name,age,email,weight,height
 
+01555555555,BMW$1000Rr,Rayana Gomeizza,15,raya@gmail.com,60.00
