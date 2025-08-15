@@ -59,6 +59,7 @@
   "C_Cpp_Runner.useLinkTimeOptimization": false,
   "C_Cpp_Runner.msvcSecureNoWarnings": false,
   "files.associations": {
-    "windows.h": "c"
+    "windows.h": "c",
+    "ASTHA.C": "cpp"
   }
 }

@@ -199,17 +199,28 @@ void printCentered(const char *text) {
  █████   █████░░█████████     █████    █████   █████ █████   █████
 ░░░░░   ░░░░░  ░░░░░░░░░     ░░░░░    ░░░░░   ░░░░░ ░░░░░   ░░░░░ 
 */
+
+/* COLOR CODES
+Red: \033[1;31m
+Green: \033[1;32m
+Yellow: \033[1;33m
+Blue: \033[1;34m
+Magenta: \033[1;35m
+Cyan: \033[1;36m
+White: \033[1;37m
+*/
+
 void defaultPage() {
     printf("\033[1;36m");  // Bold + Cyan
-    printCentered("    ###     ######  ######## ##     ##    ###       ###   \n");
-    printCentered("   ## ##   ##    ##    ##    ##     ##   ## ##     ## ##  \n");
-    printCentered("  ##   ##  ##          ##    ##     ##  ##   ##   ##   ## \n");
-    printCentered(" ##     ##  ######     ##    ######### ##     ## ##     ##\n");
-    printCentered(" #########       ##    ##    ##     ## ######### #########\n");
-    printCentered(" ##     ## ##    ##    ##    ##     ## ##     ## ##     ##\n");
-    printCentered(" ##     ##  ######     ##    ##     ## ##     ## ##     ##\n");
+printCentered("   ###     ######  ######## ##     ##    ###       ###   \n");
+printCentered("  ## ##   ##    ##    ##    ##     ##   ## ##     ## ##  \n");
+printCentered(" ##   ##  ##          ##    ##     ##  ##   ##   ##   ## \n");
+printCentered("##     ##  ######     ##    ######### ##     ## ##     ##\n");
+printCentered("#########       ##    ##    ##     ## ######### #########\n");
+printCentered("##     ## ##    ##    ##    ##     ## ##     ## ##     ##\n");
+printCentered("##     ##  ######     ##    ##     ## ##     ## ##     ##\n");
 
-    printf("\033[0m"); // Reset color
+printf("\033[0m"); // Reset color
     printf("\n");
     printCentered("Welcome to \"ASTHAA\". In Simplicity, We Trust!\n");
     printf("\n");
