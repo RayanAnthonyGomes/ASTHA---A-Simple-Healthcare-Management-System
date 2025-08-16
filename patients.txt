@@ -1,8 +1,4 @@
 01644434552,BMW$1000Rr,Jaya Ahsan,45,jaya@gmail.com,54.00
 01716657554,bmw$1000RR,Mommynul Haq,45,mommy@gmail.com,65.00
-
-
-
-phone,password,name,age,email,weight,height
-
 01555555555,BMW$1000Rr,Rayana Gomeizza,15,raya@gmail.com,60.00
+01608909226,BMW$1000Rr,Erin Frazer,22,erinfrazer@gmail.com,56.00
